@@ -22,7 +22,6 @@ export function computeGuess(
   }
 
   const answer = answerString.split('');
-
   const guessAsArray = guess.split('');
 
   const answerLetterCount: Record<string, number> = {};
