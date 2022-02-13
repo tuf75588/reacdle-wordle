@@ -16,16 +16,52 @@ export function computeGuess(
   answerString: string
 ): LetterState[] {
   const result: LetterState[] = [];
-  const guessArray = guess.split('');
-  const answerArray = answerString.split('');
-  guessArray.forEach((letter, index) => {
-    if (letter === answerString[index]) {
+
+  if (guess.length !== answerString.length) {
+    return result;
+  }
+
+  const answer = answerString.split('');
+
+  const guessAsArray = guess.split('');
+
+  const answerLetterCount: Record<string, number> = {};
+
+  guessAsArray.forEach((letter, index) => {
+    const currentAnswerLetter = answer[index];
+
+    answerLetterCount[currentAnswerLetter] = answerLetterCount[
+      currentAnswerLetter
+    ]
+      ? answerLetterCount[currentAnswerLetter] + 1
+      : 1;
+
+    if (currentAnswerLetter === letter) {
       result.push(LetterState.Match);
-    } else if (answerArray.includes(letter)) {
+    } else if (answer.includes(letter)) {
       result.push(LetterState.Present);
     } else {
       result.push(LetterState.Miss);
     }
   });
+  result.forEach((currentResult, resultIndex) => {
+    if (currentResult !== LetterState.Present) {
+      return;
+    }
+    const guessLetter = guessAsArray[resultIndex];
+    answer.forEach((currentAnswerLetter, answerIndex) => {
+      if (currentAnswerLetter !== guessLetter) {
+        return;
+      }
+      if (result[answerIndex] === LetterState.Match) {
+        result[resultIndex] = LetterState.Miss;
+      }
+      if (answerLetterCount[guessLetter] <= 0) {
+        result[resultIndex] = LetterState.Miss;
+      }
+    });
+    answerLetterCount[guessLetter]--;
+  });
+
   return result;
 }

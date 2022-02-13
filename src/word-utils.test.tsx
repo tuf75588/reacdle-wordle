@@ -8,7 +8,7 @@ describe('word-utils', () => {
     expect(getRandomWord()).toBeTruthy();
     expect(getRandomWord().length).toEqual(5);
   });
-  test('it works with all matches', () => {
+  test('full match', () => {
     expect(computeGuess('boost', 'boost')).toEqual([
       LetterState.Match,
       LetterState.Match,
@@ -26,6 +26,29 @@ describe('word-utils', () => {
       LetterState.Miss,
     ]);
   });
+
+  test('when 1 letter matches but guess has more of the same letter', () => {
+    expect(computeGuess('allol', 'colon')).toEqual([
+      LetterState.Miss,
+      LetterState.Miss,
+      LetterState.Match,
+      LetterState.Match,
+      LetterState.Miss,
+    ]);
+  });
+  test('when 2 letters are present but answer has only 1 of those letters', () => {
+    expect(computeGuess('allol', 'smelt')).toEqual([
+      LetterState.Miss,
+      LetterState.Present,
+      LetterState.Miss,
+      LetterState.Miss,
+      LetterState.Miss,
+    ]);
+  });
+  test('returns empty array when given incomplete guess', () => {
+    expect(computeGuess('so', 'boost')).toEqual([]);
+  });
+
   test('full miss', () => {
     expect(computeGuess('boost', 'guard')).toEqual([
       LetterState.Miss,
