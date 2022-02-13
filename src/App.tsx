@@ -13,8 +13,12 @@ function App() {
           Made with <span role="emoji">💘</span> by Andrew (&lt;atd285&gt;)
         </h2>
       </header>
-      <main>
-        <WordRow letters="hel" />
+      <main className="grid grid-rows-6 gap-4">
+        <WordRow letters="hello" />
+        <WordRow letters="solar" />
+        <WordRow letters="penny" />
+        <WordRow letters="snack" />
+        <WordRow letters="stare" />
       </main>
     </div>
   );
