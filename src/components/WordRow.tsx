@@ -1,12 +1,13 @@
+import { useStore } from '../store';
 import { computeGuess, getRandomWord, LetterState } from '../word-utils';
-
-const LETTER_LENGTH = 5;
+import { LETTER_LENGTH } from '../word-utils';
 type Letters = {
   letters: string;
 };
 
 function WordRow({ letters: lettersProp = '' }: Letters) {
-  const guessStates = computeGuess(lettersProp);
+  const answer = useStore((state) => state.answer);
+  const guessStates = computeGuess(lettersProp, answer);
   const lettersRemaining = LETTER_LENGTH - lettersProp.length;
   const letters = lettersProp
     .split('')
