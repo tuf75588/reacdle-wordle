@@ -1,25 +1,43 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getRandomWord } from './word-utils';
+import { computeGuess, getRandomWord } from './word-utils';
+import { LetterState } from './word-utils';
 
-// You can use `type`
-type BearState = {
-  answer: string;
-  guesses: string[];
-  name?: string;
-  addGuess: (guess: string) => void;
+type GuessRow = {
+  guess: string;
+  result?: LetterState[];
 };
 
-export const useStore = create<BearState>(
+// You can use `type`
+type StoreState = {
+  answer: string;
+  rows: GuessRow[];
+
+  addGuess: (guess: string) => void;
+  newGame: () => void;
+};
+
+export const useStore = create<StoreState>(
   persist(
-    (set) => ({
+    (set, get) => ({
       answer: getRandomWord(),
-      guesses: ['hello', 'solar', 'penny'],
+      rows: [],
       addGuess: (guess: string) => {
         set((state) => ({
-          ...state,
-          guesses: [...state.guesses, guess],
+          rows: [
+            ...state.rows,
+            {
+              guess,
+              result: computeGuess(guess, state.answer),
+            },
+          ],
         }));
+      },
+      newGame: () => {
+        set({
+          answer: getRandomWord(),
+          rows: [],
+        });
       },
     }),
     {

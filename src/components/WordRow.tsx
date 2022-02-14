@@ -1,13 +1,12 @@
-import { useStore } from '../store';
-import { computeGuess, getRandomWord, LetterState } from '../word-utils';
+import { LetterState } from '../word-utils';
 import { LETTER_LENGTH } from '../word-utils';
+
 type Letters = {
   letters: string;
+  result?: LetterState[];
 };
 
-function WordRow({ letters: lettersProp = '' }: Letters) {
-  const answer = useStore((state) => state.answer);
-  const guessStates = computeGuess(lettersProp, answer);
+function WordRow({ letters: lettersProp = '', result = [] }: Letters) {
   const lettersRemaining = LETTER_LENGTH - lettersProp.length;
   const letters = lettersProp
     .split('')
@@ -15,7 +14,7 @@ function WordRow({ letters: lettersProp = '' }: Letters) {
   return (
     <div className="grid grid-cols-5 gap-4">
       {letters.map((char, i) => (
-        <CharacterBox value={char} key={i} state={guessStates[i]} />
+        <CharacterBox value={char} key={i} state={result[i]} />
       ))}
     </div>
   );
@@ -29,7 +28,9 @@ function CharacterBox({ value, state }: CharacterBox) {
     state === undefined || null ? '' : characterStateStyles[state];
   return (
     <span
-      className={`inline-block mx-1 border border-1 border-gray-500 p-4 uppercase font-bold text-center ${stateStyles}`}
+      className={`inline-block mx-1 border border-1 border-gray-500 p-4 uppercase font-bold text-center ${stateStyles}
+      before:inline-block before:content-['_']
+      `}
     >
       {value}
     </span>
