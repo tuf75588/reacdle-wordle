@@ -12,7 +12,7 @@ type GuessRow = {
 type StoreState = {
   answer: string;
   rows: GuessRow[];
-
+  gameState: 'playing' | 'won' | 'lost';
   addGuess: (guess: string) => void;
   newGame: () => void;
 };
@@ -22,21 +22,27 @@ export const useStore = create<StoreState>(
     (set, get) => ({
       answer: getRandomWord(),
       rows: [],
+      gameState: 'playing',
       addGuess: (guess: string) => {
+        const result = computeGuess(guess, get().answer);
+        const didWin = result.every((letter) => letter === LetterState.Match);
+        const rows = [
+          ...get().rows,
+          {
+            guess,
+            result,
+          },
+        ];
         set((state) => ({
-          rows: [
-            ...state.rows,
-            {
-              guess,
-              result: computeGuess(guess, state.answer),
-            },
-          ],
+          rows,
+          gameState: didWin ? 'won' : rows.length === 6 ? 'lost' : 'playing',
         }));
       },
       newGame: () => {
         set({
           answer: getRandomWord(),
           rows: [],
+          gameState: 'playing',
         });
       },
     }),
