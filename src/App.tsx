@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import WordRow from './components/WordRow';
 import { useStore } from './store';
@@ -7,7 +7,7 @@ import { LETTER_LENGTH } from './word-utils';
 const GUESS_LENGTH = 6;
 
 function App() {
-  const [guess, setGuess] = useState('');
+  const [guess, setGuess] = useGuess();
   const state = useStore();
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newGuess = event.target.value;
@@ -72,3 +72,24 @@ function App() {
 }
 
 export default App;
+
+function useGuess() {
+  const [guess, setGuess] = useState('');
+  const onKeydown = (e: KeyboardEvent) => {
+    const key = e.key;
+    setGuess((prevState) => {
+      const newGuess = prevState + key;
+      if (prevState.length === LETTER_LENGTH) {
+        return newGuess;
+      }
+      return prevState;
+    });
+  };
+  useEffect(() => {
+    document.addEventListener('keydown', onKeydown);
+    return () => {
+      document.removeEventListener('keydown', onKeydown);
+    };
+  }, []);
+  return [guess, setGuess];
+}
