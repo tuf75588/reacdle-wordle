@@ -3,7 +3,7 @@ import './App.css';
 import WordRow from './components/WordRow';
 import { useStore, WORD_LENGTH, NUMBER_OF_GUESSES } from './store';
 import { LETTER_LENGTH, isValidWord } from './word-utils';
-
+import Keyboard from './components/Keyboard';
 const GUESS_LENGTH = 6;
 
 function App() {
@@ -52,7 +52,7 @@ function App() {
       <header className="border-b border-gray-500 pb-2 my-2">
         <h1 className="text-4xl text-center">Reacdle</h1>
         <h2 className="text-2xl text-center mb-5">
-          Made with <span role="emoji">💘</span> by Andrew (&lt;atd285&gt;)
+          Made with <span role="emoji">💘</span> by&nbsp;Andrew&lt;atd285&gt;
         </h2>
       </header>
       <main className="grid grid-rows-6 gap-4">
@@ -67,6 +67,20 @@ function App() {
           />
         ))}
       </main>
+      <Keyboard
+        onClick={(key) => {
+          addGuessLetter(key);
+        }}
+      />
+      <div className="mx-auto text-center mt-2 p-2">
+        <a
+          href="https://github.com/tuf75588/reacdle-wordle"
+          target="_blank"
+          rel="noopener"
+        >
+          &lt;Source Code /&gt;
+        </a>
+      </div>
       {isGameOver && (
         <div
           role="modal"
@@ -126,34 +140,18 @@ function useGuess(): [
       return newGuess;
     });
   };
-  const onKeydown = (e: KeyboardEvent) => {
-    const letter = e.key;
-    setGuess((currGuess) => {
-      const newGuess = currGuess.length === 1 ? currGuess + letter : letter;
-
-      switch (letter) {
-        case 'Backspace':
-          return currGuess.slice(0, -1);
-        case 'Enter':
-          if (newGuess.length === LETTER_LENGTH) {
-            addGuess(newGuess);
-            return '';
-          }
-      }
-
-      if (currGuess.length === LETTER_LENGTH) {
-        return currGuess;
-      }
-      return currGuess;
-    });
+  const onKeyDown = (e: KeyboardEvent) => {
+    let letter = e.key;
+    addGuessLetter(letter);
   };
+
   useEffect(() => {
-    document.addEventListener('keydown', onKeydown);
+    document.addEventListener('keydown', onKeyDown);
     return () => {
-      document.removeEventListener('keydown', onKeydown);
+      document.removeEventListener('keydown', onKeyDown);
     };
   }, []);
-  return [guess, setGuess];
+  return [guess, setGuess, addGuessLetter];
 }
 
 // source https://usehooks.com/usePrevious/
