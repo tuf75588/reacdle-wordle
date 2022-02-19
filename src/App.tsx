@@ -1,32 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import WordRow from './components/WordRow';
-import { useStore } from './store';
-import { LETTER_LENGTH } from './word-utils';
+import { useStore, WORD_LENGTH, NUMBER_OF_GUESSES } from './store';
+import { LETTER_LENGTH, isValidWord } from './word-utils';
 
 const GUESS_LENGTH = 6;
 
 function App() {
-  const [guess, setGuess] = useGuess();
   const state = useStore();
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newGuess = event.target.value;
-    if (newGuess.length === LETTER_LENGTH) {
-      state.addGuess(newGuess);
-      setGuess('');
-      return;
-    }
-    setGuess(newGuess);
-  };
-  let rows = [...state.rows];
+  const [guess, setGuess, addGuessLetter] = useGuess();
 
-  if (rows.length < GUESS_LENGTH) {
-    rows.push({ guess });
-  }
-  let numOfGuessesRemaining = GUESS_LENGTH - rows.length;
-  rows = rows.concat(Array(numOfGuessesRemaining).fill(''));
+  const [showInvalidGuess, setInvalidGuess] = useState(false);
+  useEffect(() => {
+    let id: NodeJS.Timeout;
+    if (showInvalidGuess) {
+      id = setTimeout(() => setInvalidGuess(false), 1500);
+    }
+
+    return () => clearTimeout(id);
+  }, [showInvalidGuess]);
+
+  const addGuess = useStore((s) => s.addGuess);
+  const previousGuess = usePrevious(guess);
+  useEffect(() => {
+    if (guess.length === 0 && previousGuess?.length === WORD_LENGTH) {
+      if (isValidWord(previousGuess)) {
+        setInvalidGuess(false);
+        addGuess(previousGuess);
+      } else {
+        setInvalidGuess(true);
+        setGuess(previousGuess);
+      }
+    }
+  }, [guess]);
 
   const isGameOver = state.gameState !== 'playing';
+
+  let rows = [...state.rows];
+
+  let currentRow = 0;
+  if (rows.length < NUMBER_OF_GUESSES) {
+    currentRow = rows.push({ guess }) - 1;
+  }
+
+  const guessesRemaining = NUMBER_OF_GUESSES - rows.length;
+
+  rows = rows.concat(Array(guessesRemaining).fill(''));
+
   return (
     <div className="mx-auto w-96 relative">
       <header className="border-b border-gray-500 pb-2 my-2">
@@ -50,7 +70,7 @@ function App() {
       {isGameOver && (
         <div className="text-center absolute bg-white left-0 right-0 top-1/4 p-6 w-3/4 mx-auto rounded border-2 border-gray-800">
           <h1 role="modal" className="text-2xl">
-            Game Over!
+            Game Over
           </h1>
           <h2 className="text-lg">
             You used {state.rows.length} out of {GUESS_LENGTH} guesses!
@@ -73,16 +93,54 @@ function App() {
 
 export default App;
 
-function useGuess() {
+function useGuess(): [
+  string,
+  React.Dispatch<React.SetStateAction<string>>,
+  (letter: string) => void
+] {
   const [guess, setGuess] = useState('');
-  const onKeydown = (e: KeyboardEvent) => {
-    const key = e.key;
-    setGuess((prevState) => {
-      const newGuess = prevState + key;
-      if (prevState.length === LETTER_LENGTH) {
+  const addGuessLetter = (letter: string) => {
+    setGuess((curGuess) => {
+      const newGuess =
+        letter.length === 1 && curGuess.length !== WORD_LENGTH
+          ? curGuess + letter
+          : curGuess;
+
+      switch (letter) {
+        case 'Backspace':
+          return newGuess.slice(0, -1);
+        case 'Enter':
+          if (newGuess.length === WORD_LENGTH) {
+            return '';
+          }
+      }
+
+      if (newGuess.length === WORD_LENGTH) {
         return newGuess;
       }
-      return prevState;
+
+      return newGuess;
+    });
+  };
+  const onKeydown = (e: KeyboardEvent) => {
+    const letter = e.key;
+    setGuess((currGuess) => {
+      const newGuess = currGuess.length === 1 ? currGuess + letter : letter;
+
+      switch (letter) {
+        case 'Backspace':
+          return currGuess.slice(0, -1);
+        case 'Enter':
+          if (newGuess.length === LETTER_LENGTH) {
+            addGuess(newGuess);
+            return '';
+          }
+      }
+
+      if (currGuess.length === LETTER_LENGTH) {
+        return currGuess;
+      }
+      return currGuess;
     });
   };
   useEffect(() => {
@@ -92,4 +150,15 @@ function useGuess() {
     };
   }, []);
   return [guess, setGuess];
+}
+
+// source https://usehooks.com/usePrevious/
+function usePrevious<T>(value: T): T {
+  const ref: any = useRef<T>();
+
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+
+  return ref.current;
 }

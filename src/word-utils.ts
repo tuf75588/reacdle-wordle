@@ -1,10 +1,6 @@
 import wordBank from './word-bank.json';
 
 export const LETTER_LENGTH = 5;
-export function getRandomWord() {
-  const randomIndex = Math.floor(Math.random() * wordBank.length);
-  return wordBank[randomIndex];
-}
 
 export enum LetterState {
   Miss,
@@ -63,4 +59,12 @@ export function computeGuess(
   });
 
   return result;
+}
+
+export function getRandomWord(): string {
+  return wordBank.valid[Math.floor(Math.random() * wordBank.valid.length)];
+}
+
+export function isValidWord(word: string): boolean {
+  return wordBank.valid.concat(wordBank.invalid).includes(word);
 }

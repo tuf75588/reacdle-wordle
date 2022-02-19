@@ -4,6 +4,7 @@ import { LETTER_LENGTH } from '../word-utils';
 type Letters = {
   letters: string;
   result?: LetterState[];
+  className: string;
 };
 
 function WordRow({ letters: lettersProp = '', result = [] }: Letters) {
