@@ -2,18 +2,16 @@ import { LetterState } from '../word-utils';
 import { LETTER_LENGTH } from '../word-utils';
 
 type Letters = {
-  letters: string;
+  word: string;
   result?: LetterState[];
   className: string;
 };
 
-function WordRow({ letters: lettersProp = '', result = [] }: Letters) {
-  const lettersRemaining = LETTER_LENGTH - lettersProp.length;
-  const letters = lettersProp
-    .split('')
-    .concat(Array(lettersRemaining).fill(''));
+function WordRow({ word = '', result = [], className = '' }: Letters) {
+  const lettersRemaining = LETTER_LENGTH - word.length;
+  const letters = word.split('').concat(Array(lettersRemaining).fill(''));
   return (
-    <div className="grid grid-cols-5 gap-4">
+    <div className={`grid grid-cols-5 gap-4 ${className}`}>
       {letters.map((char, i) => (
         <CharacterBox value={char} key={i} state={result[i]} />
       ))}

@@ -54,33 +54,37 @@ function App() {
         <h2 className="text-2xl text-center mb-5">
           Made with <span role="emoji">💘</span> by Andrew (&lt;atd285&gt;)
         </h2>
-        <input
-          type="text"
-          value={guess}
-          className="w-full p-2 border border-gray-500"
-          onChange={onChange}
-          disabled={isGameOver}
-        />
       </header>
       <main className="grid grid-rows-6 gap-4">
         {rows.map(({ guess, result }, i) => (
-          <WordRow key={i} letters={guess} result={result} />
+          <WordRow
+            key={i}
+            word={guess}
+            result={result}
+            className={
+              showInvalidGuess && i === currentRow ? 'animate-bounce' : ''
+            }
+          />
         ))}
       </main>
       {isGameOver && (
-        <div className="text-center absolute bg-white left-0 right-0 top-1/4 p-6 w-3/4 mx-auto rounded border-2 border-gray-800">
-          <h1 role="modal" className="text-2xl">
-            Game Over
-          </h1>
-          <h2 className="text-lg">
-            You used {state.rows.length} out of {GUESS_LENGTH} guesses!
-          </h2>
-          <h3 className="text-lg">The answer was {state.answer}</h3>
-          {/* button that says new game with hover effect */}
+        <div
+          role="modal"
+          className="absolute bg-white border border-gray-500 rounded text-center
+            w-11/12 h-1/2 p-6 left-0 right-0 mx-auto top-1/4
+           grid grid-rows-4"
+        >
+          <p>Game Over</p>
+          <WordRow
+            word={state.answer}
+            className="items-center justify-items-center"
+          />
+
           <button
-            className="bg-blue-500 mt-2 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="border border-green-500 rounded bg-green-500 p-2 mt-4 text-gray-800 shadow"
             onClick={() => {
               state.newGame();
+              setGuess('');
             }}
           >
             New Game
