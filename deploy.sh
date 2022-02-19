@@ -13,6 +13,6 @@ git init
 git add -A
 git commit -m 'deploy'
 
-git push -f git@github.com:tuf75588/reacdle.git main:gh-pages
+git push -f git@github.com:tuf75588/reacdle-wordle.git main:gh-pages
 
 cd -
