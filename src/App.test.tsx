@@ -6,7 +6,7 @@ import { render, screen, userEvent, within } from './test/test-utils';
 describe('App', () => {
   test('the title is visible', () => {
     render(<App />);
-    // @ts-expect-error
+
     expect(screen.getByText(/Reacdle/i)).toBeInTheDocument();
   });
 
@@ -27,7 +27,7 @@ describe('App', () => {
   test('shows lost game state', () => {
     useStore.getState().newGame(Array(6).fill('hello'));
     render(<App />);
-    // @ts-expect-error
+
     expect(screen.getByText('Game Over')).toBeInTheDocument();
   });
 
@@ -43,14 +43,14 @@ describe('App', () => {
     expect(document.querySelector('main')?.textContent).toEqual(
       initialState.join('') + answer
     );
-    // @ts-expect-error
+
     expect(screen.getByText('Game Over')).toBeInTheDocument();
   });
 
   test('can start new game', () => {
     useStore.getState().newGame(Array(6).fill('hello'));
     render(<App />);
-    // @ts-expect-error
+
     expect(screen.getByText('Game Over')).toBeInTheDocument();
 
     userEvent.click(
