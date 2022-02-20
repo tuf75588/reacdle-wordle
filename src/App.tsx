@@ -76,7 +76,7 @@ function App() {
         <a
           href="https://github.com/tuf75588/reacdle-wordle"
           target="_blank"
-          rel="noopener"
+          className="outline-2 outline-white-300 outline bg-blue-500 rounded p-1 text-white focus:text-black"
         >
           &lt;Source Code /&gt;
         </a>
